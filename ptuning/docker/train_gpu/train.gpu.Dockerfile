@@ -8,23 +8,21 @@
 FROM nvidia/cuda:11.2.2-devel-ubuntu18.04
 
 # set timezone
-RUN apt-get update -y && apt-get install -y tzdata
+RUN apt-get update -y && DEBIAN_FRONTEND="noninteractive" apt-get install -y tzdata
 ENV TZ=Asia/Shanghai
 
 # install miniconda: https://docs.conda.io/en/latest/miniconda.html#linux-installers
 RUN apt-get -y update && apt-get install -y wget && \
     mkdir -p /app && wget -P /app https://repo.anaconda.com/miniconda/Miniconda3-py38_23.1.0-1-Linux-x86_64.sh && \
     cd /app && bash Miniconda3-py38_23.1.0-1-Linux-x86_64.sh -b -p /app/dev/miniconda3 && \
-    source /app/dev/miniconda3/bin/activate base && \
-    conda init bash && source ~/.bashrc && conda env list \
+    bash -c "source /app/dev/miniconda3/bin/activate base && conda env list" && \
     rm /app/Miniconda3-py38_23.1.0-1-Linux-x86_64.sh && ls -al /app/
 
 # install chatglm-6b dependencies
-RUN source /app/dev/miniconda3/bin/activate base && conda env list && \
-    pip install protobuf \
-                torch transformers datasets accelerate peft \
-                icetk cpm_kernels rouge_chinese nltk jieba \
-                gradio==3.20.0 mdtex2html fastapi uvicorn requests
+COPY init_chatglm_6b.sh /app/init_chatglm_6b.sh
+COPY pip.conf /root/.pip/pip.conf
+RUN chmod a+x /app/init_chatglm_6b.sh && \
+    bash /app/init_chatglm_6b.sh
 RUN mkdir -p /app/source && cd /app/source && \
     apt-get update -y && apt-get install -y git && \
     git clone --recursive https://github.com/zealotpb/ChatGLM-6B.git && \
