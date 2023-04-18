@@ -25,7 +25,7 @@ RUN chmod a+x /app/init_chatglm_6b.sh && \
     bash /app/init_chatglm_6b.sh
 RUN mkdir -p /app/source && cd /app/source && \
     apt-get update -y && apt-get install -y git && \
-    git clone --recursive https://github.com/zealotpb/ChatGLM-6B.git && \
+    git clone --recursive https://github.com/zealotpb/ChatGLM-6B.git && ls -al ChatGLM-6B \
     cd /app/source/ChatGLM-6B/ptuning && \
     apt-get update -y && apt-get install -y git-lfs && git lfs install && \
     git clone --recursive https://huggingface.co/THUDM/chatglm-6b && ls -al chatglm-6b/
