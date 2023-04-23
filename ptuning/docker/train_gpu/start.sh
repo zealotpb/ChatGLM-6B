@@ -1,11 +1,6 @@
 #!/usr/bin/env bash
 
 CODE_DIR=/code
-if [ ! -d "${CODE_DIR}" ]; then
-  echo "Warning: ${CODE_DIR} doesn't exist, creating it..."
-  mkdir -p ${CODE_DIR}
-fi
-cd ${CODE_DIR} || exit 1
 
 arg_url=
 arg_branch=
@@ -80,7 +75,16 @@ if [ "${arg_main_script}" == "" ]; then
   exit 1
 fi
 
+exit 0
+
 # #################### update code
+# create code directory
+if [ ! -d "${CODE_DIR}" ]; then
+  echo "Warning: ${CODE_DIR} doesn't exist, creating it..."
+  mkdir -p ${CODE_DIR}
+fi
+cd ${CODE_DIR} || exit 1
+
 is_code_cloned=$(git rev-parse --is-inside-work-tree)
 if [ "${is_code_cloned}" == "true" ]; then
   echo "Info: ${CODE_DIR} is not cloned as cloned= ${is_code_cloned}, cloning it..."
