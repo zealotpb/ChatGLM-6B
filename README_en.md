@@ -188,14 +188,20 @@ model = AutoModel.from_pretrained("THUDM/chatglm-6b-int4", trust_remote_code=Tru
 
 If your encounter the error `Could not find module 'nvcuda.dll'` or `RuntimeError: Unknown platform: darwin`(MacOS), please [load the model locally](README_en.md#load-the-model-locally). 
 
-### GPU Inference on Mac
-For Macs (and MacBooks) with Apple Silicon, it is possible to use the MPS backend to run ChatGLM-6B on the GPU. First, you need to refer to Apple's [official instructions](https://developer.apple.com/metal/pytorch) to install PyTorch-Nightly.
+### Inference on Mac
+For Macs (and MacBooks) with Apple Silicon, it is possible to use the MPS backend to run ChatGLM-6B on the GPU. First, you need to refer to Apple's [official instructions](https://developer.apple.com/metal/pytorch) to install PyTorch-Nightly. (The correct version number should be 2.1.0.dev2023xxxx, not 2.0.0).
 
 Currently you must [load the model locally](README_en.md#load-the-model-locally) on MacOS. Change the code to load the model from your local path, and use the mps backend:
 ```python
 model = AutoModel.from_pretrained("your local path", trust_remote_code=True).half().to('mps')
 ```
-Then you can use GPU-accelerated model inference on Mac.
+
+Loading a FP16 ChatGLM-6B model requires about 13GB of memory. Machines with less memory (such as a MacBook Pro with 16GB of memory) will use the virtual memory on the hard disk when there is insufficient free memory, resulting in a serious slowdown in inference speed. At this time, a quantized model such as chatglm-6b-int4 can be used. Because the quantized kernel on the GPU is written in CUDA, it cannot be used on MacOS, and can only be inferred using the CPU:
+
+```python
+# For INT8-quantized model, change "chatglm-6b-int4" to "chatglm-6b-int8"
+model = AutoModel.from_pretrained("THUDM/chatglm-6b-int4", trust_remote_code=True).float()
+```
 
 ### Multi-GPU Deployment
 If you have multiple GPUs, but the memory size of each GPU is not sufficient to accommodate the entire model, you can split the model across multiple GPUs. 
